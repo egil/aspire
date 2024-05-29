@@ -21,6 +21,20 @@ parameters:
     default: false
 
 steps:
+  - ${{ if and(eq(variables['System.TeamProject'], 'public'), eq(variables['Build.Reason'], 'PullRequest'), eq(parameters.isWindows, 'true')) }}:
+    - script: |
+        $gitHubCommentVar = '##vso[task.setvariable variable=GITHUB_COMMENT]Comment from build pipeline!'
+        Write-Host $gitHubCommentVar
+
+    - task: GitHubComment@0
+      condition: always()
+      inputs:
+        gitHubConnection: dotnet-comment-bot-service-connection
+        repositoryName: '$(Build.Repository.Name)'
+        id: $(System.PullRequest.PullRequestNumber)
+      displayName: Report coverage to GitHub
+      continueOnError: 'true' # Avoid failing the build if the GitHub comment posting failed
+
   - script: ${{ parameters.buildScript }}
             -restore -build
             -pack
