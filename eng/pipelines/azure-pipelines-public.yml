@@ -69,6 +69,9 @@ variables:
   - name: _InternalBuildArgs
     value: ''
 
+  - name: System.Debug
+    value: true
+
 resources:
   containers:
   - container: LinuxContainer
